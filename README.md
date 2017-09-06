@@ -17,4 +17,4 @@ Unfortunately, until there is a global Canvas object in NodeJS, this utility can
 In the meantime, you will need to use the UI to convert files individually by pasting in their svg code on the right, clicking 'Convert', and pasting out the JS code on the left into a file of your choosing.
 
 ## Size Considerations
-The resulting javascript is often very easily made smaller. By trimming numbers with floating point errors and removing many redundant ctx.save and ctx.restore function calls yourself, the average scriptified svg should only be about 2 times larger than its minified original svg counterpart.
+The resulting javascript is often very easily made smaller. By trimming numbers with floating point errors and removing many redundant ctx.save and ctx.restore function calls yourself, the average scriptified svg should only be about 2 times larger than its minified original svg counterpart. After compression with tar.gz, almost all scriptified svgs are only about 1.5x the size of their counterparts.
