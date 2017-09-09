@@ -16,12 +16,33 @@
 		body {
 			padding: 0;
 			margin: 0;
-			display: flex;
+			height: 100%;
+		}
+		.app {
+			height: 100%;
+		}
+
+		.page {
+			position: absolute;
+			width: 100%;
 			height: 100%;
 			flex-direction: row;
 			background-color: #f8f8f8;
 			font-color: #111111;
+			display: none;
+			justify-content: center;
 		}
+
+		.app#intro > .page:nth-child(1) {
+			display: flex;
+		}
+		.app#single > .page:nth-child(2) {
+			display: flex;
+		}
+		.app#multi > .page:nth-child(3) {
+			display: flex;
+		}
+
 		.topUI {
 			width: 0px;
 			flex: 1 1 auto;
@@ -31,6 +52,11 @@
 			justify-content: start;
 			align-items: stretch;
 			padding: 0 10px 0 10px;
+			position: relative;
+		}
+		.topUI.limitWidth {
+			border-left: 1px solid #111111;
+			max-width: 700px;
 		}
 		#left {
 			/*background-color: red;*/
@@ -44,6 +70,16 @@
 			font-size: 20px;
 			padding: 5px;
 			border-bottom: 1px solid #111111;
+			padding-top: 0px;
+			margin-bottom: 10px;
+		}
+
+		.title:first-child {
+			padding-top: 5px;
+		}
+
+		.info {
+			margin-bottom: 10px;
 		}
 
 		.code {
@@ -55,7 +91,7 @@
 			width: 100% !important;
 			font-family: monospace;
 			border: 1px solid #111111;
-			margin: 10px 0 10px 0;
+			margin-bottom: 10px;
 			border-radius: 5px;
 			outline: 0;
 			overflow-wrap: break-word;
@@ -73,7 +109,6 @@
 		.buttons {
 			display: flex;
 			width: 100%;
-			height: 16px;
 			flex: 0 0 auto;
 			margin-bottom: 10px;
 			justify-content: center;
@@ -84,13 +119,38 @@
 			flex: 0 0 auto;
 			text-align: center;
 			align-self: center;
-			width: 100px;
-			height: 16px;
+			min-width: 100px;
+			min-height: 16px;
+			max-width: 100px;
+			max-height: 16px;
 			font-size: 16px;
 			padding: 4px;
 			border: 1px solid #111111;
 			cursor: pointer;
 			border-radius: 5px;
+		}
+		.button.dynamic {
+			min-width: 0px;
+			max-width: 0px;
+			max-width: 200px;
+			max-height: 50px;
+		}
+		.button.largeWidth {
+			min-width: 200px;
+			max-width: 200px;
+		}
+		.button.gotoView {
+			position: absolute;
+			top: 5px;
+			z-index: 1;
+			border-color: white;
+			border-radius: 0px;
+		}
+		#left > .button.gotoView {
+			left: 5px;
+		}
+		#right > .button.gotoView {
+			right: 5px;
 		}
 		.button:not(:last-child) {
 			margin-right: 10px;
@@ -116,37 +176,70 @@
 	</style>
 </head>
 <body onload="init();">
+	<div class="app">
+		<div class="page">
+			<div class="topUI limitWidth" id="left">
+				<div class="title"><b>svgtojs</b> - What is it?</div>
+				<div class="info">The svgtojs utility is a program which converts conventional svg images into a set of drawing commands for the canvas utility. These commands are output to text, such that a file can store and recall the canvas representation of the svg file it was made from. This is especially useful for graphics libraries which can't use svg images, such as three.js, or for sending bitmap versions of svgs for very small file cost.<br/> To see the full project page with ongoing, unreleased developments, go to <a href="www.github.com/dylan-thinnes/svgtojs">dylan-thinnes/svgtojs</a>.<br/>To see the source for the latest release which composes this website, go to <a href="www.github.com/svgtojs/svgtojs.github.io">svgtojs/svgtojs.github.io</a>.</div>
+				<div class="buttons">
+					<a class="button dynamic largeWidth" id="singleMode">To Copy-Paste Utility<br/>(Beginner)</a>
+					<a class="button dynamic largeWidth" id="multiMode">To Batch Utility<br/>(Experienced)</a>
+				</div>
+			</div>
+		</div>
+		<div class="page">
+			<div class="topUI" id="left">
+				<div class="title">Input SVG</div>
+				<div contenteditable="true" spellcheck="false" class="code" id="svgCodeInput"></div>
+				<div class="buttons">
+					<!-- <a class="button" id="svgUpload">Upload</a> -->
+					<a class="button" id="svgPreview">Preview</a>
+					<a class="button" id="svgSubmit">Submit</a>
+				</div>
+				<div class="buttons">
+					<input type="checkbox">Auto-Preview</input>
+				</div>
+				<div class="title">SVG Preview:</div>
+				<div class="outputContainer" id="svgPreviewOutput">
+					
+				</div>
+				<div class="button dynamic gotoView" id="gotoIntroFromSingle">&lt; To Intro</div>
+			</div>
+			<div class="topUI" id="right">
+				<div class="title">Output</div>
+				<div contenteditable="true" spellcheck="false" class="code" id="jsCodeOutput"></div>
+				<div class="buttons">
+					<!-- <a class="button" id="jsDownload">Download</a> -->
+					<a class="button" id="jsTest">Test</a>
+				</div>
+				<div class="buttons">
+					<input type="text" name="" placeholder="canvas name"></input>
+					<input type="checkbox">Auto-Test</input>
+				</div>
+				<div class="title">JS Test:</div>
+				<div class="outputContainer" id="">
+					<canvas id="canvasPreview" height="0" width="0"></canvas>
+				</div>
+				<div class="button dynamic gotoView" id="gotoMultiFromSingle">To Batch Utility &gt;</div>
+			</div>
+		</div>
+		<div class="page">
+			<div class="topUI" id="left">
+				<div class="button dynamic gotoView" id="gotoSingleFromMulti">&lt; To Copy-Paste</div>
+				<div class="title"></div>
+				<input type="file" name="batchUpload" multiple id="batchUpload">
+			</div>
+			<div class="topUI" id="right">
+				<div class="button dynamic gotoView" id="gotoIntroFromMulti">To Intro &gt;</div>
+			</div>
+		</div>
+	</div>
+
 	<script type="text/javascript" src="scripts/sinon-3.2.1.js"></script>
 	<script type="text/javascript" src="scripts/rgbcolor.js"></script> 
 	<script type="text/javascript" src="scripts/StackBlur.js"></script>
 	<script type="text/javascript" src="scripts/canvg.js"></script>
 	<script type="text/javascript" src="scripts/jsvg.js"></script>
-
 	<canvas id="canvgCanvas"></canvas>
-	<div class="topUI" id="left">
-		<div class="title">Input SVG</div>
-		<div contenteditable="true" spellcheck="false" class="code" id="svgCodeInput"></div>
-		<div class="buttons">
-			<!-- <a class="button" id="svgUpload">Upload</a> -->
-			<a class="button" id="svgPreview">Preview</a>
-			<a class="button" id="svgSubmit">Submit</a>
-		</div>
-		<div class="title">SVG Preview:</div>
-		<div class="outputContainer" id="svgPreviewOutput">
-			
-		</div>
-	</div>
-	<div class="topUI" id="right">
-		<div class="title">Output</div>
-		<div contenteditable="true" spellcheck="false" class="code" id="jsCodeOutput"></div>
-		<div class="buttons">
-			<!-- <a class="button" id="jsDownload">Download</a> -->
-			<a class="button" id="jsTest">Test</a>
-		</div>
-		<div class="title">JS Test:</div>
-		<div class="outputContainer" id="">
-			<canvas id="canvasPreview" height="0" width="0"></canvas>
-		</div>
-	</div>
 </body>
 </html>
