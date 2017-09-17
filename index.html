@@ -2,235 +2,95 @@
 <html>
 <head>
 	<title>JSVG Online Converter</title>
-	<style type="text/css">
-		.jasmine_html-reporter {
-			display: none;
-		}
-		html {
-			height: 100vh;
-			overflow: hidden;
-		}
-		canvas#canvgCanvas {
-			display: none;
-		}
-		body {
-			padding: 0;
-			margin: 0;
-			height: 100%;
-		}
-		.app {
-			height: 100%;
-		}
-
-		.page {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			flex-direction: row;
-			background-color: #f8f8f8;
-			font-color: #111111;
-			display: none;
-			justify-content: center;
-		}
-
-		.app#intro > .page:nth-child(1) {
-			display: flex;
-		}
-		.app#single > .page:nth-child(2) {
-			display: flex;
-		}
-		.app#multi > .page:nth-child(3) {
-			display: flex;
-		}
-
-		.topUI {
-			width: 0px;
-			flex: 1 1 auto;
-			height: 100%;
-			display: flex;
-			flex-direction: column;
-			justify-content: start;
-			align-items: stretch;
-			padding: 0 10px 0 10px;
-			position: relative;
-		}
-		.topUI.limitWidth {
-			border-left: 1px solid #111111;
-			max-width: 700px;
-		}
-		#left {
-			/*background-color: red;*/
-			border-right: 1px solid #111111;
-		}
-		#right {
-			/*background-color: blue;*/
-		}
-		.topUI > .title {
-			text-align: center;
-			font-size: 20px;
-			padding: 5px;
-			border-bottom: 1px solid #111111;
-			padding-top: 0px;
-			margin-bottom: 10px;
-		}
-
-		.title:first-child {
-			padding-top: 5px;
-		}
-
-		.info {
-			margin-bottom: 10px;
-		}
-
-		.code {
-			height: 0;
-			padding: 5px;
-			flex: 1 1 auto;
-			box-sizing: border-box;
-			font-size: 16px;
-			width: 100% !important;
-			font-family: monospace;
-			border: 1px solid #111111;
-			margin-bottom: 10px;
-			border-radius: 5px;
-			outline: 0;
-			overflow-wrap: break-word;
-			overflow: auto;
-			color: #111111;
-		}
-		#svgCodeInput:focus {
-			padding: 4px;
-			border: 2px solid #dd0000;
-		}
-		#jsCodeOutput:focus {
-			padding: 4px;
-			border: 2px solid #0000dd;
-		}
-		.buttons {
-			display: flex;
-			width: 100%;
-			flex: 0 0 auto;
-			margin-bottom: 10px;
-			justify-content: center;
-			align-items: center;
-			flex-direction: row;
-		}
-		.button {
-			flex: 0 0 auto;
-			text-align: center;
-			align-self: center;
-			min-width: 100px;
-			min-height: 16px;
-			max-width: 100px;
-			max-height: 16px;
-			font-size: 16px;
-			padding: 4px;
-			border: 1px solid #111111;
-			cursor: pointer;
-			border-radius: 5px;
-		}
-		.button.dynamic {
-			min-width: 0px;
-			max-width: 0px;
-			max-width: 200px;
-			max-height: 50px;
-		}
-		.button.largeWidth {
-			min-width: 200px;
-			max-width: 200px;
-		}
-		.button.gotoView {
-			position: absolute;
-			top: 5px;
-			z-index: 1;
-			border-color: white;
-			border-radius: 0px;
-		}
-		#left > .button.gotoView {
-			left: 5px;
-		}
-		#right > .button.gotoView {
-			right: 5px;
-		}
-		.button:not(:last-child) {
-			margin-right: 10px;
-		}
-		.button::selection {
-			background-color: transparent;
-		}
-		.button::moz-selection {
-			background-color: transparent;
-		}
-		.button:hover {
-			background-color: rgba(0,0,0,0.1);
-		}
-		.button:active {
-			background-color: rgba(0,0,0,0.2);
-		}
-		.outputContainer {
-			width: 100%;
-			height: 0;
-			flex: 1 1 auto;
-			overflow: auto;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="init();">
 	<div class="app">
 		<div class="page">
-			<div class="topUI limitWidth" id="left">
-				<div class="title"><b>svgtojs</b> - What is it?</div>
-				<div class="info">The svgtojs utility is a program which converts conventional svg images into a set of drawing commands for the canvas utility. These commands are output to text, such that a file can store and recall the canvas representation of the svg file it was made from. This is especially useful for graphics libraries which can't use svg images, such as three.js, or for sending bitmap versions of svgs for very small file cost.<br/> To see the full project page with ongoing, unreleased developments, go to <a href="www.github.com/dylan-thinnes/svgtojs">dylan-thinnes/svgtojs</a>.<br/>To see the source for the latest release which composes this website, go to <a href="www.github.com/svgtojs/svgtojs.github.io">svgtojs/svgtojs.github.io</a>.</div>
+			<div class="pageTitle"><b>svgtojs</b> - What is it?</div>
+			<div class="pageContainer">
+				<div class="topUI limitWidth">
+					<div class="info">The svgtojs tool is a program which converts conventional svg images into a set of drawing commands for the canvas tool. These commands are output to text, such that a file can store and recall the canvas representation of the svg file it was made from. This is especially useful for graphics libraries which can't use svg images, such as three.js, or for sending bitmap versions of svgs for very small file cost.<br/><br/>
+
+					To see the full project page with ongoing, unreleased developments, go to <a href="www.github.com/dylan-thinnes/svgtojs">dylan-thinnes/svgtojs</a>.<br/>
+					To see the source for the latest release which composes this website, go to <a href="www.github.com/svgtojs/svgtojs.github.io">svgtojs/svgtojs.github.io</a>.<br/><br/>
+
+					<b>Copy-Paste Tool</b><br/>
+					Use the Copy-Paste Tool if you are new to this tool and have never used it before. The UI will be able to introduce the concepts needed to understand the input, outputs, and options related to this tool.<br/><br/>
+
+					<b>Batch Tool</b><br/>
+					The batch tool can operate the same way on multiple files quickly, making it useful to experienced users with larger needs.</div>
+					<!-- <div class="buttons">
+						<a class="button dynamic largeWidth" id="singleMode">To Copy-Paste Tool<br/>(Beginner)</a>
+						<a class="button dynamic largeWidth" id="multiMode">To Batch Tool<br/>(Experienced)</a>
+					</div> -->
+				</div>
+			</div>
+			<div class="pageNav">
 				<div class="buttons">
-					<a class="button dynamic largeWidth" id="singleMode">To Copy-Paste Utility<br/>(Beginner)</a>
-					<a class="button dynamic largeWidth" id="multiMode">To Batch Utility<br/>(Experienced)</a>
+					<a class="button dynamic largeWidth" id="multiMode">&lt; To Batch Tool</a>
+					<a class="button dynamic largeWidth" id="singleMode">To Copy-Paste Tool &gt;</a>
 				</div>
 			</div>
 		</div>
 		<div class="page">
-			<div class="topUI" id="left">
-				<div class="title">Input SVG</div>
-				<div contenteditable="true" spellcheck="false" class="code" id="svgCodeInput"></div>
-				<div class="buttons">
-					<!-- <a class="button" id="svgUpload">Upload</a> -->
-					<a class="button" id="svgPreview">Preview</a>
-					<a class="button" id="svgSubmit">Submit</a>
+			<div class="pageTitle">Copy-Paste Tool</div>
+			<div class="pageContainer">
+				<div class="topUI" id="left">
+					<div class="title">Input SVG</div>
+					<div contenteditable="true" spellcheck="false" class="code" id="svgCodeInput"></div>
+					<div class="buttons">
+						<!-- <a class="button" id="svgUpload">Upload</a> -->
+						<a class="button" id="svgPreview">Preview</a>
+						<a class="button" id="svgSubmit">Submit</a>
+					</div>
+					<div class="buttons">
+						<input type="checkbox">Auto-Preview</input>
+					</div>
+					<div class="title">SVG Preview:</div>
+					<div class="outputContainer" id="svgPreviewOutput">
+						
+					</div>
+					<!-- <div class="title gotoView" id="gotoIntroFromSingle">&lt; To Intro</div> -->
 				</div>
-				<div class="buttons">
-					<input type="checkbox">Auto-Preview</input>
+				<div class="topUI" id="right">
+					<div class="title">Output</div>
+					<div contenteditable="true" spellcheck="false" class="code" id="jsCodeOutput"></div>
+					<div class="buttons">
+						<!-- <a class="button" id="jsDownload">Download</a> -->
+						<a class="button" id="jsTest">Test</a>
+					</div>
+					<div class="buttons">
+						<input type="text" name="" placeholder="canvas name"></input>
+						<input type="checkbox">Auto-Test</input>
+					</div>
+					<div class="title">JS Test:</div>
+					<div class="outputContainer" id="">
+						<canvas id="canvasPreview" height="0" width="0"></canvas>
+					</div>
+					<!-- <div class="title gotoView" id="gotoMultiFromSingle">To Batch Tool &gt;</div> -->
+					<!-- <div class="button dynamic gotoView" id="gotoMultiFromSingle">To Batch Tool &gt;</div> -->
 				</div>
-				<div class="title">SVG Preview:</div>
-				<div class="outputContainer" id="svgPreviewOutput">
-					
-				</div>
-				<div class="button dynamic gotoView" id="gotoIntroFromSingle">&lt; To Intro</div>
 			</div>
-			<div class="topUI" id="right">
-				<div class="title">Output</div>
-				<div contenteditable="true" spellcheck="false" class="code" id="jsCodeOutput"></div>
+			<div class="pageNav">
 				<div class="buttons">
-					<!-- <a class="button" id="jsDownload">Download</a> -->
-					<a class="button" id="jsTest">Test</a>
+					<a class="button dynamic largeWidth" id="gotoIntroFromSingle">&lt; To Intro</a>
+					<a class="button dynamic largeWidth" id="gotoMultiFromSingle">To Batch Tool &gt;</a>
 				</div>
-				<div class="buttons">
-					<input type="text" name="" placeholder="canvas name"></input>
-					<input type="checkbox">Auto-Test</input>
-				</div>
-				<div class="title">JS Test:</div>
-				<div class="outputContainer" id="">
-					<canvas id="canvasPreview" height="0" width="0"></canvas>
-				</div>
-				<div class="button dynamic gotoView" id="gotoMultiFromSingle">To Batch Utility &gt;</div>
 			</div>
 		</div>
 		<div class="page">
-			<div class="topUI" id="left">
-				<div class="button dynamic gotoView" id="gotoSingleFromMulti">&lt; To Copy-Paste</div>
-				<div class="title"></div>
-				<input type="file" name="batchUpload" multiple id="batchUpload">
+			<div class="pageTitle">Batch Tool</div>
+			<div class="pageContainer">
+				<div class="topUI limitWidth">
+					<input type="file" name="batchUpload" multiple id="batchUpload">
+				</div>
 			</div>
-			<div class="topUI" id="right">
-				<div class="button dynamic gotoView" id="gotoIntroFromMulti">To Intro &gt;</div>
+			<div class="pageNav">
+				<div class="buttons">
+					<a class="button dynamic largeWidth" id="gotoSingleFromMulti">&lt; To Copy-Paste Tool</a>
+					<a class="button dynamic largeWidth" id="gotoIntroFromMulti">To Intro &gt;</a>
+				</div>
 			</div>
 		</div>
 	</div>

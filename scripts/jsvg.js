@@ -81,7 +81,7 @@ var init = function () {
 		//Intro & View Control
 		this.setView = function (view) {
 			this.app.id = view;
-			this.view = view
+			this.view = view;
 		}
 		this.singleMode = document.getElementById("singleMode");
 		this.singleMode.addEventListener("click", this.setView.bind(this, "single"));
