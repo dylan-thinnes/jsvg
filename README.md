@@ -12,9 +12,14 @@ A few examples include:
 - You like canvg but want to be able to vary color palettes and styles without changing the underlying svg markup
 - You are more comfortable manipulating javascript commands than svg markup
 
-## How To Use
+## How to Use
+Visit [Development Version](https://dylan-thinnes.github.io/svgtojs)
+Visit [Stable Version](https://svgtojs.github.io)
+You will need to use the UI to convert files individually by pasting in their svg code on the right, clicking 'Convert', and pasting out the JS code on the left into a file of your choosing.
+
+## Project Status
+Conversion is complete, optimization of output for size is almost done.
 A file upload/convert/download system that runs on the browser is in the works, and a NodeJS utility is planned.
-In the meantime, you will need to use the UI to convert files individually by pasting in their svg code on the right, clicking 'Convert', and pasting out the JS code on the left into a file of your choosing.
 
 ## Size Considerations
 The resulting javascript is often very easily made smaller. By trimming numbers with floating point errors and removing many redundant ctx.save and ctx.restore function calls yourself, the average scriptified svg should only be about 2 times larger than its minified original svg counterpart. After compression into tar.gz, almost all scriptified svgs are only about 1.5x the size of their counterparts.
