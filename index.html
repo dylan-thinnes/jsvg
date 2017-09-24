@@ -11,7 +11,7 @@
 			<div class="pageTitle">svgtojs requires js <pre style="display: inline;">:/</pre></div>
 			<div class="pageContainer">
 				<div class="topUI limitWidth">
-					<div class="info">The svgtojs tool requires javascript, naturally. Please enable it to run this website. There are no net requests made after loading this site. What you download the first time round (html+css+js) is what you get, and nothing more.</div>
+					<div class="info">The svgtojs tool requires javascript, naturally. Please enable it to run this website.<br/>We've made sure the UI uses as little javascript as possible to function.<br/> There are no net requests made after loading this site. What you download the first time round (html+css+js) is what you get, and nothing more.</div>
 				</div>
 			</div>
 		</div>
@@ -31,10 +31,6 @@
 					To see the full project page with ongoing, unreleased developments, go to <a href="https://www.github.com/dylan-thinnes/svgtojs">dylan-thinnes/svgtojs</a>.<br/>
 					To see the source for the latest release which composes this website, go to <a href="https://www.github.com/svgtojs/svgtojs.github.io">svgtojs/svgtojs.github.io</a>.
 					</div>
-					<!-- <div class="buttons">
-						<a class="button dynamic largeWidth" id="singleMode">To Copy-Paste Tool<br/>(Beginner)</a>
-						<a class="button dynamic largeWidth" id="multiMode">To Batch Tool<br/>(Experienced)</a>
-					</div> -->
 				</div>
 			</div>
 			<div class="pageNav">
@@ -74,7 +70,7 @@
 					</div>
 					<div class="buttons">
 						<input type="text" name="" placeholder="canvas name"></input>
-						<input type="checkbox">Auto-Test</input>
+						<input type="checkbox" id="singleAutoTest">Auto-Test</input>
 					</div>
 					<div class="title">JS Test:</div>
 					<div class="outputContainer" id="">
@@ -95,7 +91,14 @@
 			<div class="pageTitle">Batch Tool</div>
 			<div class="pageContainer">
 				<div class="topUI limitWidth">
-					<input type="file" name="batchUpload" multiple id="batchUpload">
+					<div class="buttons">
+						<input type="file" name="batchUpload" multiple id="batchUpload"></input>
+					</div>
+					<div class="buttons">
+						<input type="text" name="" placeholder="canvas name" id="batchCanvasName"></input>
+						<input type="checkbox" name="" id="batchAutoTest">Auto-Test</input>
+					</div>
+					<div id="fileList"></div>
 				</div>
 			</div>
 			<div class="pageNav">

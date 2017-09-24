@@ -209,3 +209,50 @@ body {
 	flex: 1 1 auto;
 	overflow: auto;
 }
+
+#fileList {
+	width: 100%;
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	justify-content: flex-start;
+	padding-bottom: 5px;
+	border: 1px solid #aaaaaa;
+	overflow-y: scroll;
+}
+.file {
+	width: 100%;
+	margin-top: 5px;
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+}
+.fileSelected {
+	flex: 0 0 auto;
+}
+.fileRow {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: row;
+}
+.fileSelected:checked + .fileRow {
+	background-color: #F0E68C;
+}
+.fileSpacer {
+	padding: 3px 1em 3px 1em;
+	font-family: monospace;
+}
+.fileSVG, .fileJS {
+	width: 0px;
+	flex: 1 1 auto;
+	overflow: hidden;
+	font-family: monospace;
+	background-color: transparent;
+}
+.fileSVG {
+	padding: 3px 0 3px 0;
+}
+.fileJS {
+	border: 1px solid #aaaaaa;
+	padding: 2px 0 2px 0;
+}
