@@ -7,13 +7,13 @@ Canvg (canvg/canvg) is a library that can take svg and draw it to a <canvas> usi
 ## When To Use
 This utility turns svg images into javascript files that write to canvas. As such, it can essentially convert svg to bitmaps at varying resolutions and for not much size increase over svg and much less size than bitmap.
 A few examples include:
-- If you have an environment which requires bitmap / which cannot use svg images but you still want varying resolutions
-- If you have an environment which requires bitmap / which cannot use svg images but you don't want to broadcast the much larger bitmap images
+- If you have an environment which cannot use svg images but you still want varying resolutions
+- If you have an environment which requires bitmaps but you don't want to broadcast the much larger bitmap images
 - You like canvg but want to be able to vary color palettes and styles without changing the underlying svg markup
 - You are more comfortable manipulating javascript commands than svg markup
 
 ## How To Use
-Unfortunately, until there is a global Canvas object in NodeJS, this utility cannot be readily made into a command line utility. However, a file upload/convert/download system that runs on the browser is in the works.  
+A file upload/convert/download system that runs on the browser is in the works, and a NodeJS utility is planned.
 In the meantime, you will need to use the UI to convert files individually by pasting in their svg code on the right, clicking 'Convert', and pasting out the JS code on the left into a file of your choosing.
 
 ## Size Considerations
