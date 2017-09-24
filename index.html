@@ -5,7 +5,16 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="init();">
-	<div class="app">
+	<div class="app" id="nojs">
+		<script>document.getElementsByClassName("app")[0].id = "intro"</script>
+		<div class="page">
+			<div class="pageTitle">svgtojs requires js <pre style="display: inline;">:/</pre></div>
+			<div class="pageContainer">
+				<div class="topUI limitWidth">
+					<div class="info">The svgtojs tool requires javascript, naturally. Please enable it to run this website. There are no net requests made after loading this site. What you download the first time round (html+css+js) is what you get, and nothing more.</div>
+				</div>
+			</div>
+		</div>
 		<div class="page">
 			<div class="pageTitle"><b>svgtojs</b> - What is it?</div>
 			<div class="pageContainer">
@@ -98,11 +107,11 @@
 		</div>
 	</div>
 
+	<canvas id="canvgCanvas"></canvas>
 	<script type="text/javascript" src="scripts/sinon-3.2.1.js"></script>
 	<script type="text/javascript" src="scripts/rgbcolor.js"></script> 
 	<script type="text/javascript" src="scripts/StackBlur.js"></script>
 	<script type="text/javascript" src="scripts/canvg.js"></script>
-	<script type="text/javascript" src="scripts/jsvg.js"></script>
-	<canvas id="canvgCanvas"></canvas>
+	<script type="text/javascript" src="scripts/main.js"></script>
 </body>
 </html>

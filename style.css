@@ -53,13 +53,16 @@ body {
 	margin-bottom: 5px;
 }
 
-.app#intro > .page:nth-child(1) {
+.app#nojs > .page:nth-child(2) {
 	display: flex;
 }
-.app#single > .page:nth-child(2) {
+.app#intro > .page:nth-child(3) {
 	display: flex;
 }
-.app#multi > .page:nth-child(3) {
+.app#single > .page:nth-child(4) {
+	display: flex;
+}
+.app#multi > .page:nth-child(5) {
 	display: flex;
 }
 
