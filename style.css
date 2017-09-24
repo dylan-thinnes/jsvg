@@ -217,6 +217,7 @@ body {
 	flex-direction: column;
 	justify-content: flex-start;
 	padding-bottom: 5px;
+	margin-bottom: 10px;
 	border: 1px solid #aaaaaa;
 	overflow-y: scroll;
 }

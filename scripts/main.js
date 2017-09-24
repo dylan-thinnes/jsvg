@@ -206,7 +206,22 @@ var init = function () {
 		this.batchUpload = document.getElementById("batchUpload");
 		this.batchUpload.addEventListener("change", this.batchRead.bind(this));
 		
+		this.batchConvert = document.getElementById("batchConvert");
+		this.batchConvert.addEventListener("click", (function () {
+			for (var ii = 0; ii < this.batchFiles.length; ii++) {
+				this.batchFiles[ii].convert(console.log);
+			}
+		}).bind(this))	
 		this.fileList = document.getElementById("fileList");
+		this.batchConvert = document.getElementById("batchConvert");
+		this.batchConvertClick = function () {
+			console.log("converting batch...", this.batchFiles);
+			for (var file in this.batchFiles) {
+				console.log("converting file " + file);
+				this.batchFiles[file].convert(console.log);
+			}
+		}
+		this.batchConvert.addEventListener("click", this.batchConvertClick.bind(this));
 		
 		//Setup
 		this.setView("intro");
