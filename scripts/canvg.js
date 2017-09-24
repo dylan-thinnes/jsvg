@@ -40,7 +40,7 @@
 	//		 renderCallback: function => will call the function after the first render is completed
 	//		 forceRedraw: function => will call the function on every frame, if it returns true, will redraw
 	var canvg = function (target, s, opts, jsvg) {
-		console.log("calling canvg...");
+		//console.log("calling canvg...");
 		// no parameters
 		if (target == null && s == null && opts == null) {
 			var svgTags = document.querySelectorAll('svg');
@@ -71,14 +71,14 @@
 		var ctx = target.getContext('2d');
 		for (var propertyName in ctx) {
 			if (propertyName === "canvas") {
-				console.log("skipping due to canvas");
+				//console.log("skipping due to canvas");
 			} else if (typeof ctx[propertyName] !== "function") {
-				console.log("setting setter spy on " + propertyName);
+				//console.log("setting setter spy on " + propertyName);
 				if (jsvg.spies[propertyName] !== undefined) jsvg.spies[propertyName].restore();
 				jsvg.spies[propertyName] = sinon.stub(ctx, propertyName);
 				jsvg.spies[propertyName].set(jsvg.logCall.bind(jsvg, propertyName, "set"));
 			} else {
-				console.log("setting function spy on " + propertyName);
+				//console.log("setting function spy on " + propertyName);
 				if (jsvg.spies[propertyName] !== undefined) jsvg.spies[propertyName].restore();
 				jsvg.spies[propertyName] = sinon.stub(ctx, propertyName);
 				jsvg.spies[propertyName].callsFake(jsvg.logCall.bind(jsvg, propertyName, "function"));
@@ -225,7 +225,8 @@
 		svg.compressSpaces = function(s) { return s.replace(/[\s\r\t\n]+/gm,' '); }
 
 		// ajax
-		svg.ajax = function(url) {
+		svg.ajax = function () {}
+		/*function(url) {
 			var AJAX;
 			if(window.XMLHttpRequest){AJAX=new XMLHttpRequest();}
 			else{AJAX=new ActiveXObject('Microsoft.XMLHTTP');}
@@ -235,7 +236,7 @@
 			   return AJAX.responseText;
 			}
 			return null;
-		}
+		}*/
 
 		// parse xml
 		svg.parseXml = function(xml) {
