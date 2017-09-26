@@ -216,10 +216,27 @@ body {
 	flex: 1 1 auto;
 	flex-direction: column;
 	justify-content: flex-start;
-	padding-bottom: 5px;
+	padding-bottom: 2px;
 	margin-bottom: 10px;
 	border: 1px solid #aaaaaa;
 	overflow-y: scroll;
+}
+#fileListKey {
+	height: 1em;
+	margin: 0;
+	margin-bottom: 12px;
+}
+#fileListKey1 {
+	background-color: #880088;
+}
+#fileListKey2 {
+	background-color: #ff0000;
+}
+#fileListKey3 {
+	background-color: #ffff00;
+}
+#fileListKey4 {
+	background-color: #00ff00;
 }
 .file {
 	width: 100%;
