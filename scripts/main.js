@@ -123,7 +123,7 @@ SVGTOJS.BatchFile.prototype.setJsFileData = function (jsFileData) {
 }
 SVGTOJS.BatchFile.prototype.setState = function (state) {
 	this.state = state;
-	if (state === -1) this.div.children[1].children[1].style.backgroundColor = "#880088";
+	if (state === -1) this.div.children[1].children[1].style.backgroundColor = "#bb00bb";
 	else if (state === 0) this.div.children[1].children[1].style.backgroundColor = "#ff0000";
 	else if (state === 1) this.div.children[1].children[1].style.backgroundColor = "#ffff00";
 	else if (state === 2) this.div.children[1].children[1].style.backgroundColor = "#00ff00";

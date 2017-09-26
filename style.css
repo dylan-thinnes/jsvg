@@ -171,6 +171,7 @@ body {
 	border: 1px solid #111111;
 	cursor: pointer;
 	border-radius: 5px;
+	z-index: 10;
 }
 .button.dynamic {
 	min-width: 0px;
@@ -225,9 +226,10 @@ body {
 	height: 1em;
 	margin: 0;
 	margin-bottom: 12px;
+	white-space: pre-wrap;
 }
 #fileListKey1 {
-	background-color: #880088;
+	background-color: #bb00bb;
 }
 #fileListKey2 {
 	background-color: #ff0000;
