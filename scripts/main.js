@@ -82,7 +82,7 @@ SVGTOJS.combineConvertibleFiles = function (batchFiles) {
 } 
 
 
-SVGTOJS.ConvertibleFiles = function (id, parentNode, svgFileData) {
+SVGTOJS.ConvertibleFile = function (id, parentNode, svgFileData) {
 	if (parentNode !== undefined) {
 		this.div = document.createElement("div");
 		this.div.setAttribute("class", "file");
@@ -94,11 +94,11 @@ SVGTOJS.ConvertibleFiles = function (id, parentNode, svgFileData) {
 	this.svgFileData = svgFileData;
 	this.id = id;
 }
-SVGTOJS.ConvertibleFiles.prototype.setId = function (newId) {
+SVGTOJS.ConvertibleFile.prototype.setId = function (newId) {
 	if (newId === undefined && this.div !== undefined) this.id = this.div.children[1].children[2].val;
 	else this.id = newId;
 }
-SVGTOJS.ConvertibleFiles.prototype.convert = function (callback) {
+SVGTOJS.ConvertibleFile.prototype.convert = function (callback) {
 	if (this.state === 2) callback(this.jsData);
 	else if (this.state === -1) return;
 	else {
@@ -107,7 +107,7 @@ SVGTOJS.ConvertibleFiles.prototype.convert = function (callback) {
 		window.SVGTOJS.Converter.convertSVG(this.svgFileData, this.setFileData.bind(this, callback));
 	}
 }
-SVGTOJS.ConvertibleFiles.prototype.getFunctionDef = function (methodNames, compressBit) {
+SVGTOJS.ConvertibleFile.prototype.getFunctionDef = function (methodNames, compressBit) {
 	var output = "function (ctx, scaleX, scaleY) {\nvar funcNames = (\"" + this.jsData.methodsUsed.join(" ") + "\").split(\" \");\nfor (var ii = 0; ii < funcNames.length; ii++) window[\"f\" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);\nif (!isNaN(scaleX) && !isNaN(scaleY)) ctx.scale(scaleX, scaleY);\n";
 	for (var ii = 0; ii < this.jsData.commands.length; ii++) {
 		if (this.jsData.commands[ii].type === "set") {
@@ -133,7 +133,7 @@ SVGTOJS.ConvertibleFiles.prototype.getFunctionDef = function (methodNames, compr
 	output += "}";
 	return output;
 }
-SVGTOJS.ConvertibleFiles.prototype.setFileData = function (callback, jsData, err) {
+SVGTOJS.ConvertibleFile.prototype.setFileData = function (callback, jsData, err) {
 	this.jsData = jsData;
 	if (err) {
 		this.setState(-1);
@@ -143,7 +143,7 @@ SVGTOJS.ConvertibleFiles.prototype.setFileData = function (callback, jsData, err
 		callback(jsData);
 	}
 }
-SVGTOJS.ConvertibleFiles.prototype.setState = function (state) {
+SVGTOJS.ConvertibleFile.prototype.setState = function (state) {
 	this.state = state;
 	if (this.div !== undefined) {
 		if (state === -1) {
@@ -192,7 +192,7 @@ var init = function () {
 			//console.log(this.svgCodeInput.innerText);
 			//window.SVGTOJS.Converter.convertSVG.call(window.SVGTOJS.Converter, this.svgCodeInput.innerText, this.writeJsCodeOutput.bind(this));
 			console.log("submitSVGCodeInput called.");
-			this.singleFile = new SVGTOJS.ConvertibleFiles("singleFile", undefined, this.svgCodeInput.innerText);
+			this.singleFile = new SVGTOJS.ConvertibleFile("singleFile", undefined, this.svgCodeInput.innerText);
 			this.singleFile.convert(this.writeJsCodeOutput.bind(this));
 		}
 		this.writeJsCodeOutput = function (codeOutput) {
@@ -232,7 +232,7 @@ var init = function () {
 		//Multi
 		this.batchFiles = [];
 		this.createFile = function (id, svgData) {
-			this.batchFiles[id] = new SVGTOJS.ConvertibleFiles(id, this.fileList, svgData);
+			this.batchFiles[id] = new SVGTOJS.ConvertibleFile(id, this.fileList, svgData);
 		}
 		this.batchReadOutput = function (name, e) {
 			this.createFile(name, e.target.result);
