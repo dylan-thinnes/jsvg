@@ -219,7 +219,8 @@ body {
 	justify-content: flex-start;
 	padding-bottom: 2px;
 	margin-bottom: 10px;
-	border: 1px solid #aaaaaa;
+	border-top: 1px solid #aaaaaa;
+	border-bottom: 1px solid #aaaaaa;
 	overflow-y: scroll;
 }
 #fileListKey {
@@ -255,7 +256,7 @@ body {
 	display: flex;
 	flex-direction: row;
 }
-.fileSelected:checked + .fileRow {
+.file:not(.headers) > .fileSelected:checked + .fileRow {
 	background-color: #F0E68C;
 }
 .fileSpacer {
@@ -275,4 +276,19 @@ body {
 .fileJS {
 	border: 1px solid #aaaaaa;
 	padding: 2px 0 2px 0;
+}
+.headers .fileJS {
+	border: 1px solid transparent;
+}
+.errorFile {
+	opacity: 0.5;
+	width: 100%;
+	margin-top: 5px;
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+}
+.errorFile > .fileSelected {
+	opacity: 0;
+	cursor: inherit;
 }

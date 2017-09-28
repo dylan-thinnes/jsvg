@@ -3,74 +3,53 @@ SVGTOJS.Converter.init = function (drawingCanvas, testingCanvas) {
 	this.drawingCanvas = drawingCanvas;
 	this.testingCanvas = testingCanvas;
 	this.spies = {};
-	this.logs = [];
+	this.tempLogs = [];
 	this.logCall = function (propertyName, type) {
-		this.logs.push([
-			Date.now(), 
-			propertyName, 
-			type, 
-			Array.from(arguments).slice(2)
-		]);
+		this.tempLogs.push({
+			/*Date.now(),*/
+			method: propertyName, 
+			type: type, 
+			args: Array.from(arguments).slice(2)
+		});
 	}
-	this.convertLogs = function () {
-		var commands = [];
-		var methodDictionary = [];
-		for (var ii = 0; ii < this.logs.length; ii++) {
+	this.convertLogs = function (logs) {
+		var data = {
+			commands: [],
+			methodsUsed: [],
+			defaultSize: []
+		}
+		for (var ii = 0; ii < this.tempLogs.length; ii++) {
 			var commandString = "";
-			var isGet = this.logs[ii][2] === "set";
-			//commandString += "ctx." + this.logs[ii][1] + (isGet ? "" : "(");
+			var isGet = this.tempLogs[ii].type === "set";
+			//commandString += "ctx." + this.tempLogs[ii].method + (isGet ? "" : "(");
 			if (isGet) {
-				commandString += "ctx." + this.logs[ii][1] + " = '" + this.logs[ii][3][0] + "';";
+				commandString += "ctx." + this.tempLogs[ii].method + " = '" + this.tempLogs[ii].args[0] + "';";
 			} else {
-				var index = methodDictionary.indexOf(this.logs[ii][1]);
-				if (index === -1) index = methodDictionary.push(this.logs[ii][1]) - 1;
+				if (this.tempLogs[ii].method === "clearRect") {
+					data.defaultSize[0] = this.tempLogs[ii].args[2];
+					data.defaultSize[1] = this.tempLogs[ii].args[3];
+				}
+				var index = data.methodsUsed.indexOf(this.tempLogs[ii].method);
+				if (index === -1) index = data.methodsUsed.push(this.tempLogs[ii].method) - 1;
 				var funcName = "f" + index.toString();
 				commandString += funcName + "(";
-				for (var jj = 0; jj < this.logs[ii][3].length; jj++) {
-					commandString += this.logs[ii][3][jj].toString() + (jj === (this.logs[ii][3].length - 1) ? "" : ", ");
+				for (var jj = 0; jj < this.tempLogs[ii].args.length; jj++) {
+					commandString += this.tempLogs[ii].args[jj].toString() + (jj === (this.tempLogs[ii].args.length - 1) ? "" : ", ");
 				}
 				commandString += ");";
 			}
-			commands[ii] = commandString;
+			data.commands = this.tempLogs;
 		}
-		var dictionaryCommands = "var funcNames = \"" + methodDictionary.join(" ") + "\".split(\" \");\n" + 'for (var ii = 0; ii < funcNames.length; ii++) window["f" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);';
-		var resArray = ['var ctx = document.getElementById("<your canvas id here>").getContext("2d");\n', dictionaryCommands, '\nctx.save();\n', commands.join("\n"), "\nctx.restore();"];
-		resArray[3] = resArray[3].replace(/(\d?\.\d{3})\d+/g, "$1");
-		resArray[3] = resArray[3].replace("6.283", "6.283185307179586");
-		resArray[3] = resArray[3].replace(/\s/g, "");
-		return resArray;
-	}
-	this.getSize = function () {
-		var width = 0;
-		var height = 0;
-		for (var ii = 0; ii < this.logs.length; ii++) {
-			if (this.logs[ii][1] === "clearRect") {
-				width = parseInt(this.logs[ii][3][2]);
-				height = parseInt(this.logs[ii][3][3]);
-				break;
-			}
-		}
-		return [width, height];
-	}
-	this.currJS = [];
-	this.testJS = function () {
-		var sanitizedJS = this.currJS.slice(0);
-		var dimensions = this.getSize(this.logs);
-		var canvasPreview = document.getElementById(this.testingCanvas);
-		canvasPreview.setAttribute("width", dimensions[0] + "px");
-		canvasPreview.setAttribute("height", dimensions[1] + "px");
-		canvasPreview.style.width = dimensions[0] + "px";
-		canvasPreview.style.height = dimensions[1] + "px";
-		sanitizedJS[0] = 'var ctx = document.getElementById("canvasPreview").getContext("2d");\n'
-		sanitizedJS = sanitizedJS.join("");
-		eval(sanitizedJS);
+		var dictionaryCommands = "var funcNames = \"" + data.methodsUsed.join(" ") + "\".split(\" \");\n" + 'for (var ii = 0; ii < funcNames.length; ii++) window["f" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);';
+		var resArray = ['var ctx = document.getElementById("<your canvas id here>").getContext("2d");\n', dictionaryCommands, '\nctx.save();\n', data.commands.join("\n"), "\nctx.restore();"];
+		return data;
 	}
 	this.validateInput = function (markup) {
 		try {
 			var parser = new DOMParser();
 			var xmlDoc = parser.parseFromString(markup, "application/xml");
 		} catch(err) { return false };
-		if (xmlDoc.getElementsByTagName("parsererror").length>0) return false;
+		if (xmlDoc.getElementsByTagName("parsererror").length > 0) return false;
 		return true;
 	}
 	this.convertSVGQueue = [];
@@ -82,51 +61,98 @@ SVGTOJS.Converter.init = function (drawingCanvas, testingCanvas) {
 		}
 	}
 	this.convertNextSVG = function () {
+		this.tempLogs = [];
 		canvg(document.getElementById(this.drawingCanvas), this.convertSVGQueue[0][0], {}, this);
-		this.currJS = this.convertLogs(this.logs);
-		//console.log(this.currJS);
-		this.convertSVGQueue[0][1](this.currJS);
+		this.convertSVGQueue[0][1](this.convertLogs(this.tempLogs));
 		if (this.convertSVGQueue.length <= 1) this.convertSVGQueue = [];
 		else this.convertNextSVG();
 	}
 	this.init = undefined;
-};
+}
 
-SVGTOJS.BatchFile = function (id, parentNode, svgFileData) {
-	this.div = document.createElement("div");
-	this.div.setAttribute("class", "file");
-	this.div.innerHTML = `<input class="fileSelected" type="checkbox" name="${id}"></input><div class="fileRow"><div class="fileSVG">${id}</div><span class="fileSpacer">&gt;</span><input type="text" class="fileJS" value="${id}.js"></input></div>`;
-	parentNode.appendChild(this.div);
+
+SVGTOJS.combineConvertibleFiles = function (batchFiles) {
+	console.log(batchFiles);
+	var output = "SVGTOJS = {\n";
+	for (var ii = 0; ii < batchFiles.length; ii++) {
+		output += batchFiles[ii].id + ": " + batchFiles[ii].getFunctionDef() + ",\n";
+	}
+	output += "}";
+	return output;
+} 
+
+
+SVGTOJS.ConvertibleFiles = function (id, parentNode, svgFileData) {
+	if (parentNode !== undefined) {
+		this.div = document.createElement("div");
+		this.div.setAttribute("class", "file");
+		this.div.innerHTML = `<input class="fileSelected" type="checkbox" name="${id}"></input><div class="fileRow"><div class="fileSVG">${id}</div><span class="fileSpacer">&gt;</span><input type="text" class="fileJS" value="${id}.js"></input></div>`;
+		parentNode.appendChild(this.div);
+		this.div.children[1].children[2].addEventListener("change", this.setId.bind(this));
+	}
 	this.setState(0);
 	this.svgFileData = svgFileData;
 	this.id = id;
 }
-SVGTOJS.BatchFile.prototype.convert = function (callback) {
-	if (this.state === 2) callback(this.jsFileData);
+SVGTOJS.ConvertibleFiles.prototype.setId = function (newId) {
+	if (newId === undefined && this.div !== undefined) this.id = this.div.children[1].children[2].val;
+	else this.id = newId;
+}
+SVGTOJS.ConvertibleFiles.prototype.convert = function (callback) {
+	if (this.state === 2) callback(this.jsData);
 	else if (this.state === -1) return;
 	else {
 		this.setState(1);
-		window.SVGTOJS.Converter.convertSVG(this.svgFileData, (function (jsFileData, err) {
-			if (err) {
-				this.setState(-1);
-				console.log("error in parsing " + this.id + ", is the entry file valid SVG?");
-			} else {
-				this.setJsFileData(jsFileData);
-				callback(jsFileData);
-			}
-		}).bind(this));
+		//console.log(this.svgFileData);
+		window.SVGTOJS.Converter.convertSVG(this.svgFileData, this.setFileData.bind(this, callback));
 	}
 }
-SVGTOJS.BatchFile.prototype.setJsFileData = function (jsFileData) {
-	this.jsFileData = jsFileData;
-	this.setState(2);
+SVGTOJS.ConvertibleFiles.prototype.getFunctionDef = function (methodNames, compressBit) {
+	var output = "function (ctx, scaleX, scaleY) {\nvar funcNames = (\"" + this.jsData.methodsUsed.join(" ") + "\").split(\" \");\nfor (var ii = 0; ii < funcNames.length; ii++) window[\"f\" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);\nif (!isNaN(scaleX) && !isNaN(scaleY)) ctx.scale(scaleX, scaleY);\n";
+	for (var ii = 0; ii < this.jsData.commands.length; ii++) {
+		if (this.jsData.commands[ii].type === "set") {
+			var argIsString = (typeof this.jsData.commands[ii].args[0] === "string") ? "\"" : "";
+			output += this.jsData.commands[ii].method + " = " + argIsString + this.jsData.commands[ii].args[0] + argIsString + "\n";
+		} else {
+			var tempOutput = "f" + ii.toString() + "(";
+			for (var jj = 0; jj < this.jsData.commands[ii].args.length; jj++) {
+				var argIsString = (typeof this.jsData.commands[ii].args[jj] === "string") ? "\"" : "";
+				tempOutput += (jj === 0 ? "" : ",") + argIsString + this.jsData.commands[ii].args[jj].toString() + argIsString;
+			}
+			tempOutput += ");\n";
+			if (compressBit) {
+				for (var ii = 0; ii < data.commands.length; ii++) {
+					tempOutput = tempOutput.replace(/(\d?\.\d{3})\d+/g, "$1");
+					tempOutput = tempOutput.replace("6.283", "6.283185307179586");
+					tempOutput = tempOutput.replace(/\s/g, "");
+				}
+			}
+			output += tempOutput;
+		}
+	}
+	output += "}";
+	return output;
 }
-SVGTOJS.BatchFile.prototype.setState = function (state) {
+SVGTOJS.ConvertibleFiles.prototype.setFileData = function (callback, jsData, err) {
+	this.jsData = jsData;
+	if (err) {
+		this.setState(-1);
+		console.log("error in parsing " + this.id + ", is the entry file valid SVG?");
+	} else {
+		this.setState(2);
+		callback(jsData);
+	}
+}
+SVGTOJS.ConvertibleFiles.prototype.setState = function (state) {
 	this.state = state;
-	if (state === -1) this.div.children[1].children[1].style.backgroundColor = "#bb00bb";
-	else if (state === 0) this.div.children[1].children[1].style.backgroundColor = "#ff0000";
-	else if (state === 1) this.div.children[1].children[1].style.backgroundColor = "#ffff00";
-	else if (state === 2) this.div.children[1].children[1].style.backgroundColor = "#00ff00";
+	if (this.div !== undefined) {
+		if (state === -1) {
+			this.div.children[1].children[1].style.backgroundColor = "#bb00bb";
+			this.div.className = "errorFile";
+		} else if (state === 0) this.div.children[1].children[1].style.backgroundColor = "#ff0000";
+		else if (state === 1) this.div.children[1].children[1].style.backgroundColor = "#ffff00";
+		else if (state === 2) this.div.children[1].children[1].style.backgroundColor = "#00ff00";
+	}
 }
 
 var init = function () {
@@ -164,11 +190,15 @@ var init = function () {
 		}
 		this.submitSVGCodeInput = function (e) {
 			//console.log(this.svgCodeInput.innerText);
-			window.SVGTOJS.Converter.convertSVG.call(window.SVGTOJS.Converter, this.svgCodeInput.innerText, this.writeJSCodeOutput.bind(this));
+			//window.SVGTOJS.Converter.convertSVG.call(window.SVGTOJS.Converter, this.svgCodeInput.innerText, this.writeJsCodeOutput.bind(this));
+			console.log("submitSVGCodeInput called.");
+			this.singleFile = new SVGTOJS.ConvertibleFiles("singleFile", undefined, this.svgCodeInput.innerText);
+			this.singleFile.convert(this.writeJsCodeOutput.bind(this));
 		}
-		this.writeJSCodeOutput = function (codeOutput, err) {
-			if (err) this.jsCodeOutput = "error with parsing xml input, is the input legitimate xml?";
-			else this.jsCodeOutput.innerText = codeOutput.join("");
+		this.writeJsCodeOutput = function (codeOutput) {
+			//if (err) this.jsCodeOutput = "error with parsing xml input, is the input legitimate xml?";
+			//else this.jsCodeOutput.innerText = codeOutput.join("");
+			this.jsCodeOutput.innerText = this.singleFile.getFunctionDef();
 		}
 		this.previewSVGCodeInput = function (e) {
 			//console.log(this.svgPreviewOutput.innerHTML, this.svgCodeInput.innerText);
@@ -181,13 +211,28 @@ var init = function () {
 		this.svgSubmit = document.getElementById("svgSubmit");
 		this.svgSubmit.addEventListener("click", this.submitSVGCodeInput.bind(this));
 		this.jsDownload = document.getElementById("jsDownload");
+		this.testJsHandler = function () {
+			//console.log("Calling testJsHandler.");
+			if (this.singleFile == undefined) return;
+			var canvasPreview = document.getElementById("canvasPreview");
+			canvasPreview.setAttribute("width", this.singleFile.jsData.defaultSize[0] + "px");
+			canvasPreview.setAttribute("height", this.singleFile.jsData.defaultSize[1] + "px");
+			canvasPreview.style.width = this.singleFile.jsData.defaultSize[0] + "px";
+			canvasPreview.style.height = this.singleFile.jsData.defaultSize[1] + "px";
+			var ctx = canvasPreview.getContext("2d");
+			for (var ii = 0; ii < this.singleFile.jsData.commands.length; ii++) {
+				//console.log(this.singleFile.jsData.commands[ii], ctx[this.singleFile.jsData.commands[ii].method]);
+				if (this.singleFile.jsData.commands[ii].type === "set") ctx[this.singleFile.jsData.commands[ii].method] = this.singleFile.jsData.commands[ii].args[0];
+				else ctx[this.singleFile.jsData.commands[ii].method].apply(ctx, this.singleFile.jsData.commands[ii].args);
+			}
+		}
 		this.jsTest = document.getElementById("jsTest");
-		this.jsTest.addEventListener("click", window.SVGTOJS.Converter.testJS.bind(window.SVGTOJS.Converter));
+		this.jsTest.addEventListener("click", this.testJsHandler.bind(this));
 
 		//Multi
 		this.batchFiles = [];
 		this.createFile = function (id, svgData) {
-			this.batchFiles[id] = new SVGTOJS.BatchFile(id, this.fileList, svgData);
+			this.batchFiles[id] = new SVGTOJS.ConvertibleFiles(id, this.fileList, svgData);
 		}
 		this.batchReadOutput = function (name, e) {
 			this.createFile(name, e.target.result);
@@ -208,12 +253,13 @@ var init = function () {
 		
 		this.batchConvert = document.getElementById("batchConvert");
 		this.batchConvert.addEventListener("click", (function () {
-			for (var ii = 0; ii < this.batchFiles.length; ii++) {
-				this.batchFiles[ii].convert(console.log);
+			var checkedFiles = this.getCheckedFiles();
+			for (var ii = 0; ii < checkedFiles.length; ii++) {
+				this.batchFiles[checkedFiles[ii][0]].convert(console.log);
 			}
-		}).bind(this))	
+		}).bind(this));	
 		this.fileList = document.getElementById("fileList");
-		this.batchConvert = document.getElementById("batchConvert");
+		/*this.batchConvert = document.getElementById("batchConvert");
 		this.batchConvertClick = function () {
 			console.log("converting batch...", this.batchFiles);
 			for (var file in this.batchFiles) {
@@ -221,7 +267,39 @@ var init = function () {
 				this.batchFiles[file].convert(console.log);
 			}
 		}
-		this.batchConvert.addEventListener("click", this.batchConvertClick.bind(this));
+		this.batchConvert.addEventListener("click", this.batchConvertClick.bind(this));*/
+		this.getCheckedFiles = function () {
+			var batches = document.getElementsByClassName("file");
+			var checkedFiles = [];
+			for (var ii = 1; ii < batches.length; ii++) {
+				if (batches[ii].children[0].checked === true) {
+					/*var batchFile = this.batchFiles[batches[ii].children[0].getAttribute("name")];
+					if (batchFile !== undefined && batchFile.state == 2) {*/
+						checkedFiles.push([batches[ii].children[0].getAttribute("name"), batches[ii].children[1].children[2].value]);
+					/*} else {
+						batches[ii].children[0].setAttribute("checked", "false");
+					}*/
+				}
+			}
+			return checkedFiles;
+		}
+		this.batchDownload = document.getElementById("batchDownload");
+		this.batchDownloadHandler = function () {
+			var checkedFiles = this.getCheckedFiles();
+			var downloadableFiles = [];
+			for (var ii = 0; ii < checkedFiles.length; ii++) {
+				var batchFile = this.batchFiles[checkedFiles[ii][0]];
+				console.log(batchFile);
+				if (batchFile !== undefined && batchFile.state == 2) {
+					//checkedFiles.push([batches[ii].children[0].getAttribute("name"), batches[ii].children[1].children[2].value]);
+					downloadableFiles.push(batchFile);
+				} else {
+					batches[ii].children[0].setAttribute("checked", "false");
+				}
+			}	
+			console.log(downloadableFiles, SVGTOJS.combineConvertibleFiles(downloadableFiles));
+		}
+		this.batchDownload.addEventListener("click", this.batchDownloadHandler.bind(this));
 		
 		//Setup
 		this.setView("intro");
