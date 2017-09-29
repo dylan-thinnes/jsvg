@@ -232,9 +232,14 @@ var init = function () {
 		this.jsTest.addEventListener("click", this.testJsHandler.bind(this));
 
 		//Multi
+		this.batchAutoConvert = document.getElementById("batchAutoConvert")
+		this.isBatchAutoConvert = function () {
+			return this.batchAutoConvert.checked;
+		}
 		this.batchFiles = [];
 		this.createFile = function (id, svgData) {
 			this.batchFiles[id] = new SVGTOJS.ConvertibleFile(id, this.fileList, svgData);
+			if (this.isBatchAutoConvert()) this.batchFiles[id].convert(function () {});
 		}
 		this.batchReadOutput = function (name, e) {
 			this.createFile(name, e.target.result);
