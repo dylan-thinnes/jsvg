@@ -95,11 +95,11 @@
 						<input type="file" name="batchUpload" multiple id="batchUpload"></input>
 					</div>
 					<div class="buttons">
-						<input type="text" name="" placeholder="canvas name" id="batchCanvasName"></input>
+						<input type="text" name="" placeholder="Batch Filename" id="batchFileName"></input>
 						<input type="checkbox" name="" id="batchAutoConvert">Auto-Convert</input>
 					</div>
 					<div id="fileList">
-						<div class="file headers"><input class="fileSelected" type="checkbox" name=""></input><div class="fileRow"><div class="fileSVG">File Name</div><span class="fileSpacer">&gt;</span><div type="text" class="fileJS">Output Name</div></div></div>
+						<div class="file headers"><input class="fileSelected" id="checkAll" type="checkbox" name=""></input><div class="fileRow"><div class="fileSVG">File Name</div><span class="fileSpacer">&gt;</span><div type="text" class="fileJS">Output Name</div></div></div>
 					</div>
 					<pre id="fileListKey">Color Codes for "&gt;": <span id="fileListKey1">Error</span> <span id="fileListKey2">Ready to Convert</span> <span id="fileListKey3">Converting</span> <span id="fileListKey4">Converted - Ready to DL</span>
 					</pre>
@@ -123,6 +123,8 @@
 	<script type="text/javascript" src="scripts/rgbcolor.js"></script> 
 	<script type="text/javascript" src="scripts/StackBlur.js"></script>
 	<script type="text/javascript" src="scripts/canvg.js"></script>
+	<script type="text/javascript" src="scripts/FileSaver.min.js"></script>
+	<script type="text/javascript" src="scripts/Blob.js"></script>
 	<script type="text/javascript" src="scripts/main.js"></script>
 </body>
 </html>

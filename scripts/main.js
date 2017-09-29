@@ -75,7 +75,10 @@ SVGTOJS.combineConvertibleFiles = function (batchFiles) {
 	console.log(batchFiles);
 	var output = "SVGTOJS = {\n";
 	for (var ii = 0; ii < batchFiles.length; ii++) {
-		output += batchFiles[ii].id + ": " + batchFiles[ii].getFunctionDef() + ",\n";
+		output += "\"" + batchFiles[ii].id + "\": " + batchFiles[ii].getFunctionDef() + ",\n";
+	}
+	if (batchFiles.length === 0) {
+		output += "//There is nothing in this collection of svgtojs functions, because no svgs were uploaded to create it.";
 	}
 	output += "}";
 	return output;
@@ -108,29 +111,28 @@ SVGTOJS.ConvertibleFile.prototype.convert = function (callback) {
 	}
 }
 SVGTOJS.ConvertibleFile.prototype.getFunctionDef = function (methodNames, compressBit) {
-	var output = "function (ctx, scaleX, scaleY) {\nvar funcNames = (\"" + this.jsData.methodsUsed.join(" ") + "\").split(\" \");\nfor (var ii = 0; ii < funcNames.length; ii++) window[\"f\" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);\nif (!isNaN(scaleX) && !isNaN(scaleY)) ctx.scale(scaleX, scaleY);\n";
+	compressBit = !compressBit
+	var output = "function (ctx, scaleX, scaleY) {\nvar funcNames = (\"" + this.jsData.methodsUsed.join(" ") + "\").split(\" \");\nfor (var ii = 0; ii < funcNames.length; ii++) window[\"f\" + ii.toString()] = ctx[funcNames[ii]].bind(ctx);\nctx.save();\nif (!isNaN(scaleX) && !isNaN(scaleY)) ctx.scale(scaleX, scaleY);\n";
 	for (var ii = 0; ii < this.jsData.commands.length; ii++) {
 		if (this.jsData.commands[ii].type === "set") {
 			var argIsString = (typeof this.jsData.commands[ii].args[0] === "string") ? "\"" : "";
-			output += this.jsData.commands[ii].method + " = " + argIsString + this.jsData.commands[ii].args[0] + argIsString + "\n";
+			var tempOutput = "ctx." + this.jsData.commands[ii].method + " = " + argIsString + this.jsData.commands[ii].args[0] + argIsString + ";\n";
 		} else {
-			var tempOutput = "f" + ii.toString() + "(";
+			var tempOutput = "f" + this.jsData.methodsUsed.indexOf(this.jsData.commands[ii].method).toString() + "(";
 			for (var jj = 0; jj < this.jsData.commands[ii].args.length; jj++) {
 				var argIsString = (typeof this.jsData.commands[ii].args[jj] === "string") ? "\"" : "";
-				tempOutput += (jj === 0 ? "" : ",") + argIsString + this.jsData.commands[ii].args[jj].toString() + argIsString;
+				tempOutput += (jj === 0 ? "" : ", ") + argIsString + this.jsData.commands[ii].args[jj].toString() + argIsString;
 			}
 			tempOutput += ");\n";
-			if (compressBit) {
-				for (var ii = 0; ii < data.commands.length; ii++) {
-					tempOutput = tempOutput.replace(/(\d?\.\d{3})\d+/g, "$1");
-					tempOutput = tempOutput.replace("6.283", "6.283185307179586");
-					tempOutput = tempOutput.replace(/\s/g, "");
-				}
-			}
-			output += tempOutput;
 		}
+		if (compressBit) {
+			tempOutput = tempOutput.replace(/(\d?\.\d{3})\d+/g, "$1");
+			tempOutput = tempOutput.replace("6.283", "6.283185307179586");
+			tempOutput = tempOutput.replace(/\s/g, "");
+		}
+		output += tempOutput;
 	}
-	output += "}";
+	output += "ctx.restore():\n}";
 	return output;
 }
 SVGTOJS.ConvertibleFile.prototype.setFileData = function (callback, jsData, err) {
@@ -268,20 +270,47 @@ var init = function () {
 			}
 		}
 		this.batchConvert.addEventListener("click", this.batchConvertClick.bind(this));*/
+		this.checkAll = document.getElementById("checkAll");
+		this.checkAllClick = function () {
+			var files = document.getElementsByClassName("file");
+			var allAreChecked = true;
+			for (var ii = 1; ii < files.length; ii++) {
+				if (files[ii].children[0].checked === false) {
+					allAreChecked = false;
+					break;
+				}
+			}
+			if (allAreChecked === true) {
+				this.checkAll.checked = false;
+				for (var ii = 1; ii < files.length; ii++) {
+					files[ii].children[0].checked = false;
+				}
+			} else {
+				this.checkAll.checked = true;
+				for (var ii = 1; ii < files.length; ii++) {
+					files[ii].children[0].checked = true;
+				}
+			}
+			
+		}
+		this.checkAll.addEventListener("click", this.checkAllClick.bind(this));
 		this.getCheckedFiles = function () {
-			var batches = document.getElementsByClassName("file");
+			var files = document.getElementsByClassName("file");
 			var checkedFiles = [];
-			for (var ii = 1; ii < batches.length; ii++) {
-				if (batches[ii].children[0].checked === true) {
-					/*var batchFile = this.batchFiles[batches[ii].children[0].getAttribute("name")];
+			for (var ii = 1; ii < files.length; ii++) {
+				if (files[ii].children[0].checked === true) {
+					/*var batchFile = this.batchFiles[files[ii].children[0].getAttribute("name")];
 					if (batchFile !== undefined && batchFile.state == 2) {*/
-						checkedFiles.push([batches[ii].children[0].getAttribute("name"), batches[ii].children[1].children[2].value]);
+						checkedFiles.push([files[ii].children[0].getAttribute("name"), files[ii].children[1].children[2].value]);
 					/*} else {
-						batches[ii].children[0].setAttribute("checked", "false");
+						files[ii].children[0].checked = false;
 					}*/
 				}
 			}
 			return checkedFiles;
+		}
+		this.getFileName = function () {
+			return document.getElementById("batchFileName").value;
 		}
 		this.batchDownload = document.getElementById("batchDownload");
 		this.batchDownloadHandler = function () {
@@ -290,14 +319,18 @@ var init = function () {
 			for (var ii = 0; ii < checkedFiles.length; ii++) {
 				var batchFile = this.batchFiles[checkedFiles[ii][0]];
 				console.log(batchFile);
-				if (batchFile !== undefined && batchFile.state == 2) {
-					//checkedFiles.push([batches[ii].children[0].getAttribute("name"), batches[ii].children[1].children[2].value]);
+				if (batchFile !== undefined && batchFile.state === 2) {
 					downloadableFiles.push(batchFile);
-				} else {
-					batches[ii].children[0].setAttribute("checked", "false");
+				} else if (batchFile !== undefined && batchFile.state !== 2) {
+					batchFile.div.children[0].checked = false;
 				}
-			}	
-			console.log(downloadableFiles, SVGTOJS.combineConvertibleFiles(downloadableFiles));
+			}
+			if (downloadableFiles.length === 0) return alert("There is nothing in your selection that is downloadable! Are they all converted?");
+			//console.log(downloadableFiles, SVGTOJS.combineConvertibleFiles(downloadableFiles));
+			else {
+				var blob = new Blob([SVGTOJS.combineConvertibleFiles(downloadableFiles)], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, this.getFileName());
+			}
 		}
 		this.batchDownload.addEventListener("click", this.batchDownloadHandler.bind(this));
 		
