@@ -135,7 +135,7 @@ SVGTOJS.ConvertibleFile.prototype.getFunctionDef = function (methodNames, compre
 		}
 		output += tempOutput;
 	}
-	output += "ctx.restore():\n}";
+	output += "ctx.restore();\n}";
 	return output;
 }
 SVGTOJS.ConvertibleFile.prototype.setFileData = function (callback, jsData, err) {
