@@ -86,20 +86,23 @@ SVGTOJS.combineConvertibleFiles = function (batchFiles) {
 
 
 SVGTOJS.ConvertibleFile = function (id, parentNode, svgFileData) {
+	console.log(id);
 	if (parentNode !== undefined) {
 		this.div = document.createElement("div");
 		this.div.setAttribute("class", "file");
 		this.div.innerHTML = `<input class="fileSelected" type="checkbox" name="${id}"></input><div class="fileRow"><div class="fileSVG">${id}</div><span class="fileSpacer">&gt;</span><input type="text" class="fileJS" value="${id}.js"></input></div>`;
 		parentNode.appendChild(this.div);
-		this.div.children[1].children[2].addEventListener("change", this.setId.bind(this));
+		this.div.children[1].children[2].addEventListener("change", this.setId.bind(this, undefined));
 	}
 	this.setState(0);
 	this.svgFileData = svgFileData;
 	this.id = id;
 }
 SVGTOJS.ConvertibleFile.prototype.setId = function (newId) {
-	if (newId === undefined && this.div !== undefined) this.id = this.div.children[1].children[2].val;
-	else this.id = newId;
+	console.log(newId, this.div);
+	if (newId === undefined && this.div !== undefined) {
+		this.id = this.div.children[1].children[2].value;
+	} else this.id = newId;
 }
 SVGTOJS.ConvertibleFile.prototype.convert = function (callback) {
 	if (this.state === 2) callback(this.jsData);
